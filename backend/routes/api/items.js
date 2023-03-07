@@ -152,7 +152,6 @@ async function generateImage(prompt) {
       "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
     }
   }).then(function(response) {
-    // console.log(response.data.data[0].url);
     return response.data.data[0].url;
   }).catch(function(error) {
     console.log(`Image generator failed with the error: ${error}`);
@@ -173,10 +172,7 @@ router.post("/", auth.required, function(req, res, next) {
       item.seller = user;
 
       if(!item.image) {
-        console.log('before');
-        console.log(process.env);
         item.image = await generateImage(item.title);
-        console.log('after');
       }
 
       return item.save().then(function() {
