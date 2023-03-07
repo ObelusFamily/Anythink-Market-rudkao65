@@ -6,6 +6,7 @@ var User = mongoose.model("User");
 var auth = require("../auth");
 const axios = require('axios');
 const { sendEvent } = require("../../lib/event");
+require('dotenv').config();
 
 // Preload item objects on routes with ':item'
 router.param("item", function(req, res, next, slug) {
