@@ -149,8 +149,29 @@ router.post("/", auth.required, function(req, res, next) {
 
       item.seller = user;
 
-      if (!item.image) {
+      if(!item.image) {
         item.image = await generateImage(item.title);
+      }
+
+      // generate image
+      async function generateImage(prompt) {
+        return await axios.post('https://api.openai.com/v1/images/generations', JSON.stringify({
+          prompt: `${prompt}`,
+          n: 1,
+          size: "256x256",
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer: ${process.env.OPENAI_API_KEY}`,
+          }
+        }).then(function(response) {
+          console.log(response.data.data[0].url);
+          return response.data.data[0].url;
+        }).catch(function(error) {
+          console.log(`Image generator failed with the error: ${error}`);
+          return '';
+        });
+        
       }
 
       return item.save().then(function() {
@@ -161,25 +182,6 @@ router.post("/", auth.required, function(req, res, next) {
     .catch(next);
 });
 
-// generate image
-async function generateImage(prompt) {
-  return await axios.post('https://api.openai.com/v1/images/generations', JSON.stringify({
-    prompt: prompt,
-    n: 1,
-    size: "256x256",
-  }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer: ${process.env.OPENAI_API_KEY}`,
-    }
-  }).then(function(response) {
-    return response.data.data[0].url
-  }).catch(function(error) {
-    console.log(`Image generator failed with the error: ${error}`);
-    return '';
-  });
-  
-}
 
 // return a item
 router.get("/:item", auth.optional, function(req, res, next) {
