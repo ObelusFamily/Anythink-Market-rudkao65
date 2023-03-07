@@ -6,6 +6,7 @@ var User = mongoose.model("User");
 var auth = require("../auth");
 const axios = require('axios');
 const { sendEvent } = require("../../lib/event");
+
 require('dotenv').config();
 
 // Preload item objects on routes with ':item'
@@ -147,11 +148,11 @@ async function generateImage(prompt) {
     "size": "256x256",
   }), {
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer: ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
     }
   }).then(function(response) {
-    console.log(response.data.data[0].url);
+    // console.log(response.data.data[0].url);
     return response.data.data[0].url;
   }).catch(function(error) {
     console.log(`Image generator failed with the error: ${error}`);
@@ -172,7 +173,10 @@ router.post("/", auth.required, function(req, res, next) {
       item.seller = user;
 
       if(!item.image) {
+        console.log('before');
+        console.log(process.env);
         item.image = await generateImage(item.title);
+        console.log('after');
       }
 
       return item.save().then(function() {
